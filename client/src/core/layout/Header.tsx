@@ -21,7 +21,7 @@ export const Header: React.FC = () => {
       <div className="header-container">
         <div className="header-logo">
           {/* Logo */}
-          <h1>AI Dashboard</h1>
+          <h1>최경후 듀터님 짱</h1>
         </div>
 
         <nav className="header-nav">
