@@ -147,6 +147,12 @@ class Settings(BaseSettings):
     # 여기에 도메인별 설정을 추가할 수 있습니다
     # 예: ENABLE_SAMPLE_DOMAIN: bool = True
 
+    # Weekly Report Domain
+    GEMINI_API_KEY: str = Field(
+        default="",
+        description="Gemini API Key (주간보고 AI 윤문용)"
+    )
+
 
 @lru_cache()
 def get_settings() -> Settings:
