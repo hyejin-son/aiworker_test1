@@ -12,7 +12,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-import google.generativeai as genai
+from google import genai
 
 from server.app.core.config import settings
 from server.app.shared.base.service import BaseService
@@ -39,10 +39,9 @@ class WeeklyReportService(BaseService):  # type: ignore[type-arg]
     def __init__(self) -> None:
         super().__init__(db=None)  # type: ignore[arg-type]
 
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+        gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-        self._calculator = WeeklyReportCalculator(gemini_client=gemini_model)
+        self._calculator = WeeklyReportCalculator(gemini_client=gemini_client)
         self._formatter = WeeklyReportFormatter()
 
     async def execute(  # type: ignore[override]

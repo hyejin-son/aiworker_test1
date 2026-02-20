@@ -275,8 +275,9 @@ class WeeklyReportCalculator(BaseCalculator[WeeklyReportCalculatorInput, WeeklyR
         """단일 SR 항목을 Gemini로 윤문합니다."""
         prompt = self._build_prompt(raw["raw_title"], raw["raw_summary"], raw["raw_content"])
         try:
-            response = await asyncio.to_thread(
-                self._gemini.generate_content, prompt
+            response = await self._gemini.aio.models.generate_content(
+                model="gemini-2.0-flash-lite",
+                contents=prompt,
             )
             title, summary, content = self._parse_gemini_response(
                 response.text, raw["raw_title"], raw["raw_summary"], raw["raw_content"]
