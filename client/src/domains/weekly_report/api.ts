@@ -14,7 +14,7 @@ export async function generateWeeklyReport(
   const response = await apiClient.post<WeeklyReportResponse>(
     '/v1/weekly-report/generate',
     formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } },
+    { timeout: 120000 },
   );
   return response.data;
 }
