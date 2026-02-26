@@ -1,17 +1,25 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import { Activity, Zap, ArrowRight, Database, FileCode, BookOpen, Layers, Layout, Code } from 'lucide-react';
 import { LoadingOverlay } from './core/loading';
 import { DocumentViewer } from './components/DocumentViewer';
 import { checkDatabaseConnection } from './domains/system/api';
 import { toast } from './core/utils/toast';
-
-interface DocumentConfig {
-  title: string;
-  filePath: string;
-}
+import { WeeklyReportPage } from './domains/weekly_report';
 
 function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/weekly-report" element={<WeeklyReportPage />} />
+        <Route path="*" element={<LandingPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function LandingPage() {
   const [connectionStatus, setConnectionStatus] = useState<'loading' | 'ok' | 'error'>('loading');
   const [documentViewer, setDocumentViewer] = useState<{
     isOpen: boolean;
@@ -23,7 +31,7 @@ function App() {
     filePath: '',
   });
 
-  const documents: Record<string, DocumentConfig> = {
+  const documents: Record<string, { title: string; filePath: string }> = {
     overview: { title: '프로젝트 개요', filePath: '/README.md' },
     quickStart: { title: '빠른 시작', filePath: '/DOC/BEGINNER_QUICK_START.md' },
     devGuide: { title: '개발 가이드', filePath: '/DOC/DEVELOPMENT_GUIDE.md' },
@@ -31,41 +39,31 @@ function App() {
 
   const openDocument = (key: keyof typeof documents) => {
     const doc = documents[key];
-    setDocumentViewer({
-      isOpen: true,
-      title: doc.title,
-      filePath: doc.filePath,
-    });
+    setDocumentViewer({ isOpen: true, title: doc.title, filePath: doc.filePath });
   };
 
   const closeDocument = () => {
-    setDocumentViewer({
-      isOpen: false,
-      title: '',
-      filePath: '',
-    });
+    setDocumentViewer({ isOpen: false, title: '', filePath: '' });
   };
 
   useEffect(() => {
-    // 백엔드 연결 확인
     const checkConnection = async () => {
       try {
-        await axios.get('http://localhost:8000/api/v1/health'); // 실제 API 경로에 맞춰 조정 필요
+        await axios.get('http://localhost:8000/api/v1/health');
         setConnectionStatus('ok');
-      } catch (err) {
+      } catch {
         setConnectionStatus('error');
       }
     };
     checkConnection();
   }, []);
 
-  // DB 연결 테스트 핸들러
   const handleDBCheck = async () => {
     try {
       const result = await checkDatabaseConnection();
       toast.success(result.message);
-    } catch (error: any) {
-      const errorMessage = error?.message || 'DB 연결 실패';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'DB 연결 실패';
       toast.error(errorMessage);
     }
   };
@@ -107,6 +105,13 @@ function App() {
                 <BookOpen size={16} />
                 개발 가이드
               </button>
+              <Link
+                to="/weekly-report"
+                className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors"
+              >
+                <FileCode size={16} />
+                주간보고
+              </Link>
             </div>
 
             <div className="flex items-center gap-4">
@@ -124,9 +129,12 @@ function App() {
                 <Database size={14} />
                 DB 연결 테스트
               </button>
-              <button className="bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all active:scale-95">
-                시작하기
-              </button>
+              <Link
+                to="/weekly-report"
+                className="bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all active:scale-95"
+              >
+                주간보고 시작
+              </Link>
             </div>
           </div>
         </nav>
